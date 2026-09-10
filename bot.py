@@ -1,9 +1,10 @@
 import os
+import random
 import threading
 
-from flask import Flask
 from dotenv import load_dotenv
 
+from flask import Flask, render_template
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
@@ -51,8 +52,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def accueil():
-    return "🎲 DÉFI RÉFLEXION - Bot Telegram actif !"
-
+    return render_template("index.html")
 
 def lancer_serveur():
     port = int(os.environ.get("PORT", 10000))
