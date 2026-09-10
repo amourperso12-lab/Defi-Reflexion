@@ -1,11 +1,14 @@
 import os
 import random
 import threading
+import secrets
 
 from dotenv import load_dotenv
 
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify, request, session
+
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -47,12 +50,255 @@ TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 TAILLE_PLATEAU = 30
 
+
 app = Flask(__name__)
 
+app.secret_key = os.getenv(
+    "FLASK_SECRET_KEY",
+    "cle-secrete-pour-defi-reflexion"
+)
 
 @app.route("/")
 def accueil():
     return render_template("index.html")
+
+
+# ============================================================
+# PARTIES WEB
+# ============================================================
+
+web_parties = {}
+
+
+def get_web_player():
+
+    web_id = session.get("web_id")
+
+    if not web_id:
+        web_id = secrets.token_hex(16)
+        session["web_id"] = web_id
+
+    if web_id not in web_parties:
+
+        joueur = creer_joueur(
+            web_id,
+            "Joueur Web",
+            None
+        )
+
+        web_parties[web_id] = joueur
+
+    return web_parties[web_id]
+
+
+def etat_joueur_web(joueur):
+
+    return {
+        "nom": joueur.get("nom", "Joueur Web"),
+        "position": joueur.get("position", 1),
+        "vies": joueur.get("vies", 3),
+        "points": joueur.get("points", 0),
+        "jetons": joueur.get("jetons", 0),
+        "serie": joueur.get("serie", 0),
+        "niveau": niveau(joueur)
+    }
+# ============================================================
+# API WEB — DÉMARRER UNE PARTIE
+# ============================================================
+
+@app.route("/api/start", methods=["POST"])
+def api_start():
+
+    joueur = get_web_player()
+
+    joueur.clear()
+
+    nouveau_joueur = creer_joueur(
+        session["web_id"],
+        "Joueur Web",
+        None
+    )
+
+    web_parties[session["web_id"]] = nouveau_joueur
+
+    joueur = nouveau_joueur
+
+    return jsonify({
+        "success": True,
+        "message": "🎮 Nouvelle partie !",
+        "joueur": etat_joueur_web(joueur)
+    })
+
+
+# ============================================================
+# API WEB — LANCER LE DÉ
+# ============================================================
+
+@app.route("/api/dice", methods=["POST"])
+def api_dice():
+
+    joueur = get_web_player()
+
+    resultat = core_lancer_de(joueur)
+
+    de = resultat["de"]
+    ancienne_position = resultat["ancienne_position"]
+    nouvelle_position = resultat["nouvelle_position"]
+
+    if verifier_victoire(joueur):
+
+        return jsonify({
+            "success": True,
+            "victoire": True,
+            "de": de,
+            "ancienne_position": ancienne_position,
+            "nouvelle_position": nouvelle_position,
+            "message": "🏆 VICTOIRE ! Tu as atteint la case 30 !",
+            "joueur": etat_joueur_web(joueur)
+        })
+
+    type_carte = choisir_carte()
+
+    if type_carte in ["QUESTION", "DEFI"]:
+
+        carte = core_tirer_carte(type_carte)
+
+        joueur["carte"] = carte
+
+        return jsonify({
+            "success": True,
+            "victoire": False,
+            "type": type_carte,
+            "de": de,
+            "ancienne_position": ancienne_position,
+            "nouvelle_position": nouvelle_position,
+            "question": carte["question"],
+            "reponses": carte["reponses"],
+            "message": "🧠 Réponds à la question !",
+            "joueur": etat_joueur_web(joueur)
+        })
+
+    if type_carte == "CHANCE":
+
+        carte = core_tirer_carte("CHANCE")
+
+        action, valeur, texte = carte
+
+        appliquer_effet(
+            joueur,
+            action,
+            valeur
+        )
+
+        return jsonify({
+            "success": True,
+            "type": "CHANCE",
+            "de": de,
+            "ancienne_position": ancienne_position,
+            "nouvelle_position": nouvelle_position,
+            "message": texte,
+            "joueur": etat_joueur_web(joueur)
+        })
+
+    if type_carte == "PIEGE":
+
+        carte = core_tirer_carte("PIEGE")
+
+        action, valeur, texte = carte
+
+        appliquer_effet(
+            joueur,
+            action,
+            valeur
+        )
+
+        return jsonify({
+            "success": True,
+            "type": "PIEGE",
+            "de": de,
+            "ancienne_position": ancienne_position,
+            "nouvelle_position": nouvelle_position,
+            "message": texte,
+            "joueur": etat_joueur_web(joueur)
+        })
+
+
+# ============================================================
+# API WEB — RÉPONDRE À UNE QUESTION
+# ============================================================
+
+@app.route("/api/answer", methods=["POST"])
+def api_answer():
+
+    joueur = get_web_player()
+
+    if "carte" not in joueur:
+
+        return jsonify({
+            "success": False,
+            "message": "❌ Aucune question en cours."
+        }), 400
+
+    data = request.get_json()
+
+    choix = int(data.get("choix", -1))
+
+    carte = joueur["carte"]
+
+    resultat = traiter_reponse(
+        joueur,
+        carte,
+        choix
+    )
+
+    if resultat["correct"]:
+
+        message = (
+            "✅ Bonne réponse ! "
+            f"+{resultat['points_gagnes']} points"
+        )
+
+        if resultat["bonus"] > 0:
+            message += " 🔥 Bonus de série !"
+
+    else:
+
+        bonne_reponse = carte["reponses"][carte["bonne"]]
+
+        message = (
+            "❌ Mauvaise réponse ! "
+            f"La bonne réponse était : {bonne_reponse}"
+        )
+
+    joueur.pop("carte", None)
+
+    if joueur["vies"] <= 0:
+
+        message += " 💀 GAME OVER !"
+
+        return jsonify({
+            "success": True,
+            "game_over": True,
+            "message": message,
+            "joueur": etat_joueur_web(joueur)
+        })
+
+    return jsonify({
+        "success": True,
+        "game_over": False,
+        "message": message,
+        "joueur": etat_joueur_web(joueur)
+    })
+
+    return {
+        "nom": joueur.get("nom", "Joueur Web"),
+        "position": joueur.get("position", 1),
+        "vies": joueur.get("vies", 3),
+        "points": joueur.get("points", 0),
+        "jetons": joueur.get("jetons", 0),
+        "serie": joueur.get("serie", 0),
+        "niveau": niveau(joueur)
+    }
 
 def lancer_serveur():
     port = int(os.environ.get("PORT", 10000))
