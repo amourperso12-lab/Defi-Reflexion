@@ -1,5 +1,7 @@
 import os
+import threading
 
+from flask import Flask
 from dotenv import load_dotenv
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -9,6 +11,10 @@ from telegram.ext import (
     CallbackQueryHandler,
     ContextTypes,
 )
+
+load_dotenv()
+
+TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 from core import (
     creer_joueur,
@@ -36,12 +42,21 @@ from database import (
 # CONFIGURATION
 # ============================================================
 
-load_dotenv()
-
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 TAILLE_PLATEAU = 30
 
+app = Flask(__name__)
+
+
+@app.route("/")
+def accueil():
+    return "🎲 DÉFI RÉFLEXION - Bot Telegram actif !"
+
+
+def lancer_serveur():
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
 
 # ============================================================
 # PARTIES EN COURS
@@ -741,6 +756,11 @@ def main():
 
     print("🤖 Bot démarré...")
     print("🎲 DÉFI RÉFLEXION est prêt !")
+
+    threading.Thread(
+        target=lancer_serveur,
+        daemon=True
+    ).start()
 
     application.run_polling()
 
