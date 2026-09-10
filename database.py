@@ -123,10 +123,8 @@ def ajouter_victoire(telegram_id, score, jetons):
         jetons,
         telegram_id
     ))
-
     connexion.commit()
     connexion.close()
-
 
 # ============================================================
 # 💾 ENREGISTRER LE SCORE D'UNE PARTIE TERMINÉE
@@ -214,3 +212,80 @@ def classement(limite=10):
     connexion.close()
 
     return resultats
+def creer_table_utilisateurs_web():
+    connexion = connexion_base()
+    curseur = connexion.cursor()
+
+    curseur.execute("""
+        CREATE TABLE IF NOT EXISTS utilisateurs_web (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            date_inscription TEXT NOT NULL
+        )
+    """)
+
+    connexion.commit()
+    connexion.close()
+
+
+def creer_utilisateur_web(username, password_hash):
+    connexion = connexion_base()
+    curseur = connexion.cursor()
+
+    try:
+        curseur.execute("""
+            INSERT INTO utilisateurs_web
+            (username, password_hash, date_inscription)
+            VALUES (?, ?, ?)
+        """, (
+            username,
+            password_hash,
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        ))
+
+        connexion.commit()
+        return True
+
+    except sqlite3.IntegrityError:
+        return False
+
+    finally:
+        connexion.close()
+
+
+def obtenir_utilisateur_web(username):
+    connexion = connexion_base()
+    curseur = connexion.cursor()
+
+    curseur.execute("""
+        SELECT id, username, password_hash
+        FROM utilisateurs_web
+        WHERE username = ?
+    """, (username,))
+
+    resultat = curseur.fetchone()
+
+    connexion.close()
+
+    return resultat
+
+def enregistrer_joueur_web(web_id, username):
+    connexion = connexion_base()
+    curseur = connexion.cursor()
+
+    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    curseur.execute("""
+        INSERT OR IGNORE INTO joueurs
+        (telegram_id, username, nom, date_inscription)
+        VALUES (?, ?, ?, ?)
+    """, (
+        web_id,
+        username,
+        username,
+        date
+    ))
+
+    connexion.commit()
+    connexion.close()

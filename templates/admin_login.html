@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Connexion Administration - Défi Réflexion</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background:
+                radial-gradient(circle at top, #2563eb, #111827 60%);
+            color: white;
+            padding: 20px;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 35px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+        }
+
+        .logo {
+            font-size: 55px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #d1d5db;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .login-button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: #fbbf24;
+            color: #111827;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .login-button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.20);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #fecaca;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 25px;
+            color: #dbeafe;
+            text-decoration: none;
+        }
+
+        .back:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-box">
+
+    <div class="logo">🔐</div>
+
+    <h1>Administration</h1>
+
+    <p class="subtitle">
+        Connecte-toi à ton espace administrateur
+    </p>
+
+    {% if erreur %}
+        <div class="error">
+            {{ erreur }}
+        </div>
+    {% endif %}
+
+    <form method="POST" action="/admin/login">
+
+        <div class="form-group">
+            <label for="username">
+                👤 Identifiant
+            </label>
+
+            <input
+                type="text"
+                id="username"
+                name="username"
+                placeholder="Identifiant administrateur"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="password">
+                🔑 Mot de passe
+            </label>
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Mot de passe"
+                required
+            >
+        </div>
+
+        <button
+            type="submit"
+            class="login-button">
+            🔓 Se connecter
+        </button>
+
+    </form>
+
+    <a href="/" class="back">
+        🏠 Retour à l'accueil
+    </a>
+
+</div>
+
+</body>
+</html>

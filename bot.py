@@ -5,7 +5,9 @@ import secrets
 
 from dotenv import load_dotenv
 
-from flask import Flask, render_template, jsonify, request, session
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from flask import Flask, render_template, jsonify, request, session, redirect
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -39,8 +41,10 @@ from database import (
     ajouter_victoire,
     enregistrer_score,
     classement,
+    creer_table_utilisateurs_web,
+    creer_utilisateur_web,
+    obtenir_utilisateur_web,
 )
-
 
 # ============================================================
 # CONFIGURATION
@@ -60,8 +64,149 @@ app.secret_key = os.getenv(
 
 @app.route("/")
 def accueil():
-    return render_template("index.html")
+    utilisateur_connecte = session.get("web_user")
 
+    return render_template(
+        "index.html",
+        utilisateur_connecte=utilisateur_connecte
+    )
+# ============================================================
+# 🔐 ADMINISTRATION
+# ============================================================
+
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "1234")
+
+app.route("/inscription", methods=["GET", "POST"])
+def inscription():
+    if request.method == "POST":
+
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
+        password_confirm = request.form.get("password_confirm", "")
+
+        if not username or not password:
+            return render_template(
+                "inscription.html",
+                erreur="❌ Tous les champs sont obligatoires."
+            )
+
+        if password != password_confirm:
+            return render_template(
+                "inscription.html",
+                erreur="❌ Les mots de passe ne correspondent pas."
+            )
+
+        if len(password) < 4:
+            return render_template(
+                "inscription.html",
+                erreur="❌ Le mot de passe doit contenir au moins 4 caractères."
+            )
+
+        password_hash = generate_password_hash(password)
+
+        succes = creer_utilisateur_web(
+            username,
+            password_hash
+        )
+
+        if not succes:
+            return render_template(
+                "inscription.html",
+                erreur="❌ Ce nom d'utilisateur existe déjà."
+            )
+
+        utilisateur = obtenir_utilisateur_web(username)
+
+        session["web_user"] = username
+        session["web_id"] = utilisateur[0]
+
+        return redirect("/")
+
+    return render_template("inscription.html")
+
+@app.route("/connexion", methods=["GET", "POST"])
+def connexion():
+    if request.method == "POST":
+
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
+
+        utilisateur = obtenir_utilisateur_web(username)
+
+        if utilisateur and check_password_hash(
+            utilisateur[2],
+            password
+        ):
+            session["web_user"] = utilisateur[1]
+            session["web_id"] = utilisateur[0]
+
+            return redirect("/")
+
+        return render_template(
+            "connexion.html",
+            erreur="❌ Nom d'utilisateur ou mot de passe incorrect."
+        )
+
+    return render_template("connexion.html")
+
+@app.route("/deconnexion")
+def deconnexion():
+    session.pop("web_user", None)
+    session.pop("web_id", None)
+
+    return redirect("/")
+
+@app.route("/admin/login", methods=["GET", "POST"])
+def admin_login():
+
+    if request.method == "POST":
+
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+
+            session["admin"] = True
+
+            return redirect("/admin")
+
+        return render_template(
+            "admin_login.html",
+            erreur="❌ Identifiant ou mot de passe incorrect."
+        )
+
+    return render_template("admin_login.html")
+
+
+@app.route("/admin")
+def admin():
+
+    if not session.get("admin"):
+        return redirect("/admin/login")
+
+    joueurs = classement(50)
+
+    return render_template(
+        "admin.html",
+        joueurs=joueurs
+    )
+
+
+@app.route("/admin/logout")
+def admin_logout():
+
+    session.pop("admin", None)
+
+    return redirect("/admin/login")
+
+@app.route("/classement")
+def page_classement():
+    joueurs = classement(50)
+    return render_template(
+        "classement.html",
+        joueurs=joueurs
+    )
 
 # ============================================================
 # PARTIES WEB
@@ -78,18 +223,19 @@ def get_web_player():
         web_id = secrets.token_hex(16)
         session["web_id"] = web_id
 
+    username = session.get("web_user", "Joueur Web")
+
     if web_id not in web_parties:
 
         joueur = creer_joueur(
             web_id,
-            "Joueur Web",
-            None
+            username,
+            username
         )
 
         web_parties[web_id] = joueur
 
     return web_parties[web_id]
-
 
 def etat_joueur_web(joueur):
 
@@ -233,7 +379,6 @@ def api_answer():
     joueur = get_web_player()
 
     if "carte" not in joueur:
-
         return jsonify({
             "success": False,
             "message": "❌ Aucune question en cours."
@@ -251,6 +396,23 @@ def api_answer():
         choix
     )
 
+    # La carte est terminée
+    joueur.pop("carte", None)
+
+    # Vérification de la victoire
+    victoire = verifier_victoire(joueu)
+
+    return jsonify({
+        "success": True,
+        "correct": resultat["correct"],
+        "points_gagnes": resultat["points_gagnes"],
+        "bonus": resultat["bonus"],
+        "vies_perdues": resultat["vies_perdues"],
+        "serie": resultat["serie"],
+        "jetons_gagnes": resultat["jetons_gagnes"],
+        "victoire": victoire,
+        "joueur": etat_joueur_web(joueur)
+    })
     if resultat["correct"]:
 
         message = (
@@ -301,7 +463,12 @@ def api_answer():
     }
 
 def lancer_serveur():
+
+    creer_base()
+    creer_table_utilisateurs_web()
+
     port = int(os.environ.get("PORT", 10000))
+
     app.run(host="0.0.0.0", port=port)
 
 # ============================================================
@@ -982,6 +1149,9 @@ def main():
 
     creer_base()
 
+    creer_table_utilisateurs_web()
+
+
     application = Application.builder().token(TOKEN).build()
 
     application.add_handler(
@@ -1012,4 +1182,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if os.getenv("WEB_ONLY") == "1":
+        lancer_serveur()
+    else:
+        main()

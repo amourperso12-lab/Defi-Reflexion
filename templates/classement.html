@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>🏆 Classement - Défi Réflexion</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 20% 10%, #7c3aed 0%, transparent 30%),
+                radial-gradient(circle at 80% 20%, #2563eb 0%, transparent 30%),
+                linear-gradient(135deg, #020617, #111827, #1e1b4b);
+            color: white;
+            padding: 40px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+            margin: auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .logo {
+            font-size: 70px;
+            filter:
+                drop-shadow(0 0 10px #fbbf24)
+                drop-shadow(0 0 25px #f59e0b);
+            animation: float 2s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        h1 {
+            font-size: 42px;
+            margin: 10px 0;
+            background: linear-gradient(
+                90deg,
+                #fbbf24,
+                #fde68a,
+                #f59e0b
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #cbd5e1;
+            font-size: 17px;
+        }
+
+        .ranking {
+            background: rgba(15, 23, 42, 0.80);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow:
+                0 25px 60px rgba(0,0,0,0.45),
+                0 0 40px rgba(59,130,246,0.15);
+            backdrop-filter: blur(15px);
+        }
+
+        .ranking-header,
+        .player {
+            display: grid;
+            grid-template-columns: 80px 1fr 150px 170px;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .ranking-header {
+            background: linear-gradient(
+                90deg,
+                rgba(37,99,235,0.40),
+                rgba(124,58,237,0.40)
+            );
+            color: #e0e7ff;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .player {
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            transition: 0.25s;
+        }
+
+        .player:last-child {
+            border-bottom: none;
+        }
+
+        .player:hover {
+            background: rgba(59,130,246,0.12);
+            transform: scale(1.01);
+            box-shadow: inset 4px 0 0 #3b82f6;
+        }
+
+        .position {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .username {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .wins {
+            color: #4ade80;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .score {
+            color: #fbbf24;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(251,191,36,0.4);
+        }
+
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #cbd5e1;
+            font-size: 18px;
+        }
+
+        .back {
+            display: block;
+            width: fit-content;
+            margin: 30px auto 0;
+            padding: 14px 28px;
+            background: linear-gradient(
+                135deg,
+                #2563eb,
+                #7c3aed
+            );
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: bold;
+            box-shadow: 0 10px 25px rgba(37,99,235,0.35);
+            transition: 0.2s;
+        }
+
+        .back:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(124,58,237,0.45);
+        }
+
+        @media (max-width: 700px) {
+
+            body {
+                padding: 25px 10px;
+            }
+
+            h1 {
+                font-size: 32px;
+            }
+
+            .logo {
+                font-size: 55px;
+            }
+
+            .ranking-header,
+            .player {
+                grid-template-columns: 55px 1fr 80px 105px;
+                padding: 15px 10px;
+                font-size: 13px;
+            }
+
+            .name {
+                font-size: 15px;
+            }
+
+            .wins,
+            .score {
+                font-size: 14px;
+            }
+
+            .position {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <div class="logo">
+            🏆
+        </div>
+
+        <h1>
+            Classement
+        </h1>
+
+        <p class="subtitle">
+            🔥 Les meilleurs joueurs de Défi Réflexion
+        </p>
+
+    </div>
+
+    <div class="ranking">
+
+        <div class="ranking-header">
+
+            <div>#</div>
+
+            <div>👤 Joueur</div>
+
+            <div>🏆 Victoires</div>
+
+            <div>⭐ Meilleur score</div>
+
+        </div>
+
+        {% if joueurs %}
+
+            {% for joueur in joueurs %}
+
+            <div class="player">
+
+                <div class="position">
+
+                    {% if loop.index == 1 %}
+                        🥇
+                    {% elif loop.index == 2 %}
+                        🥈
+                    {% elif loop.index == 3 %}
+                        🥉
+                    {% else %}
+                        {{ loop.index }}
+                    {% endif %}
+
+                </div>
+
+                <div>
+
+                    <div class="name">
+                        {{ joueur[1] }}
+                    </div>
+
+                    {% if joueur[0] %}
+                    <div class="username">
+                        @{{ joueur[0] }}
+                    </div>
+                    {% endif %}
+
+                </div>
+
+                <div class="wins">
+                    {{ joueur[2] }}
+                </div>
+
+                <div class="score">
+                    {{ joueur[3] }} pts
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty">
+
+                🎮 Aucun joueur dans le classement pour le moment.
+
+                <br><br>
+
+                🚀 Joue une partie pour apparaître ici !
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+    <a href="/" class="back">
+        🏠 Retour à l'accueil
+    </a>
+
+</div>
+
+</body>
+</html>

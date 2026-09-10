@@ -301,24 +301,57 @@
 
         <div class="buttons">
 
-            <button onclick="startGame()">
-                🎮 Jouer
-            </button>
+    <button onclick="startGame()">
+        🎮 Jouer
+    </button>
 
-            <button onclick="alert('La connexion sera ajoutée prochainement.')">
-                👤 Connexion
-            </button>
+    <button onclick="window.location.href='/connexion'">
+        👤 Connexion
+    </button>
 
-            <button onclick="alert('Le classement sera ajouté prochainement.')">
-                🏆 Classement
-            </button>
+    <a href="/classement" class="btn">
+        🏆 Classement
+    </a>
 
-            <a href="/admin/login" class="btn">
-                🔐 Administration
-            </a>
+    <a href="/admin/login" class="btn">
+        🔐 Administration
+    </a>
 
-        </div>
+</div>
 
+<div class="buttons">
+
+    <button onclick="startGame()">
+        🎮 Jouer
+    </button>
+
+    {% if utilisateur_connecte %}
+
+    <div class="user-connected">
+        👤 Connecté : <strong>{{ utilisateur_connecte }}</strong>
+    </div>
+
+    <a href="/deconnexion" class="btn">
+        👋 Déconnexion
+    </a>
+
+{% else %}
+
+    <button onclick="window.location.href='/connexion'">
+        👤 Connexion
+    </button>
+
+{% endif %}
+
+    <a href="/classement" class="btn">
+        🏆 Classement
+    </a>
+
+    <a href="/admin/login" class="btn">
+        🔐 Administration
+    </a>
+
+</div>
         <div class="features">
 
             <div class="card">
