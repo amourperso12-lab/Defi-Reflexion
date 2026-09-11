@@ -4,482 +4,380 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Défi Réflexion</title>
+    <title>🎲 Défi Réflexion</title>
 
     <style>
-
         * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
         }
 
         body {
+            margin: 0;
             font-family: Arial, sans-serif;
-            min-height: 100vh;
-            background:
-                radial-gradient(circle at top, #2563eb, #111827 55%);
+            background: linear-gradient(135deg, #0f172a, #1e293b);
             color: white;
-            padding: 30px 15px;
+            min-height: 100vh;
         }
 
-        .container {
-            width: 100%;
-            max-width: 1000px;
-            margin: auto;
-            text-align: center;
-        }
-
-        /* =========================
-           ACCUEIL
-        ========================= */
-
-        #accueil {
-            padding-top: 70px;
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 15px 25px;
+            background: rgba(15, 23, 42, 0.97);
+            border-bottom: 1px solid #334155;
         }
 
         .logo {
-            font-size: 80px;
-            margin-bottom: 10px;
+            color: white;
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .nav-links a,
+        .user-name {
+            color: white;
+            text-decoration: none;
+            padding: 9px 12px;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover {
+            background: #334155;
+        }
+
+        .user-name {
+            color: #38bdf8;
+            font-weight: bold;
+        }
+
+        .container {
+            width: min(1000px, 94%);
+            margin: 30px auto;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid #334155;
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .home {
+            text-align: center;
+            padding: 60px 20px;
         }
 
         h1 {
-            font-size: 52px;
-            margin-bottom: 15px;
+            font-size: 38px;
+            margin-bottom: 10px;
         }
 
-        .description {
-            font-size: 20px;
-            color: #d1d5db;
-            margin-bottom: 40px;
+        h2 {
+            margin-top: 0;
         }
 
-        .buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
+        .subtitle {
+            color: #cbd5e1;
+            font-size: 18px;
+            margin-bottom: 30px;
         }
 
         button,
-        .btn {
+        .button-link {
             border: none;
-            cursor: pointer;
-            padding: 15px 30px;
-            border-radius: 12px;
-            font-size: 18px;
+            border-radius: 10px;
+            padding: 12px 18px;
+            font-size: 16px;
             font-weight: bold;
-            background: white;
-            color: #1e3a8a;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+            background: #2563eb;
+            color: white;
             transition: 0.2s;
         }
 
         button:hover,
-        .btn:hover {
-            transform: translateY(-3px);
+        .button-link:hover {
+            transform: translateY(-2px);
             opacity: 0.9;
         }
 
-        .features {
-            margin-top: 50px;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
+        .secondary {
+            background: #475569;
         }
 
-        .card {
-            background: rgba(255,255,255,0.1);
-            padding: 25px;
-            border-radius: 15px;
-            width: 200px;
+        .success {
+            background: #16a34a;
         }
 
-        .card h3 {
-            margin-bottom: 10px;
-        }
-
-        .card p {
-            color: #d1d5db;
-        }
-
-        /* =========================
-           JEU
-        ========================= */
-
-        #jeu {
-            display: none;
-        }
-
-        .game-header {
-            margin-bottom: 25px;
-        }
-
-        .game-header h2 {
-            font-size: 35px;
-            margin-bottom: 8px;
+        .danger {
+            background: #dc2626;
         }
 
         .stats {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 12px;
-            margin-bottom: 25px;
+            margin: 20px 0;
         }
 
         .stat {
-            background: rgba(255,255,255,0.12);
-            border-radius: 14px;
-            padding: 18px 10px;
-            border: 1px solid rgba(255,255,255,0.15);
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
         }
 
-        .stat-icon {
-            font-size: 25px;
+        .stat-label {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 5px;
         }
 
         .stat-value {
-            font-size: 23px;
+            font-size: 24px;
             font-weight: bold;
-            margin-top: 5px;
         }
 
-        /* =========================
-           PLATEAU
-        ========================= */
-
-        .plateau {
+        .board {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 8px;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 7px;
             margin: 25px 0;
         }
 
         .case {
-            min-height: 65px;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.15);
-            border-radius: 10px;
+            min-height: 45px;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            background: #334155;
+            border-radius: 8px;
             font-weight: bold;
-            position: relative;
+            font-size: 14px;
         }
 
-        .case.joueur {
-            background: #2563eb;
-            border-color: white;
-            box-shadow: 0 0 20px rgba(255,255,255,0.3);
-        }
-
-        .pion {
-            font-size: 25px;
-        }
-
-        /* =========================
-           ACTION
-        ========================= */
-
-        .action-panel {
-            background: rgba(0,0,0,0.25);
-            padding: 25px;
-            border-radius: 18px;
-            margin-top: 20px;
-        }
-
-        #message {
-            font-size: 20px;
-            margin-bottom: 20px;
-            min-height: 30px;
-        }
-
-        #diceButton {
-            background: #fbbf24;
+        .case.active {
+            background: #f59e0b;
             color: #111827;
-            font-size: 21px;
-            padding: 18px 40px;
         }
 
-        #diceButton:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .question-box {
+            margin: 20px 0;
+            padding: 20px;
+            background: #0f172a;
+            border-radius: 14px;
+            border: 1px solid #334155;
         }
 
-        /* =========================
-           QUESTION
-        ========================= */
-
-        #questionPanel {
-            display: none;
-            margin-top: 25px;
-            background: rgba(255,255,255,0.1);
-            padding: 25px;
-            border-radius: 18px;
-        }
-
-        #questionType {
-            font-size: 18px;
-            margin-bottom: 15px;
-        }
-
-        #question {
-            font-size: 23px;
+        .question {
+            font-size: 20px;
             font-weight: bold;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
 
         #answers {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
-        .answer {
-            width: 100%;
-            background: white;
-            color: #111827;
+        #answers button {
+            flex: 1;
+            min-width: 150px;
+            background: #7c3aed;
         }
 
-        /* =========================
-           BOUTON RETOUR
-        ========================= */
+        .message {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 10px;
+            background: #172554;
+            border: 1px solid #2563eb;
+            font-weight: bold;
+        }
 
-        .back-button {
+        .actions {
+            text-align: center;
             margin-top: 20px;
-            background: transparent;
-            color: white;
-            border: 1px solid rgba(255,255,255,0.4);
         }
 
-        /* =========================
-           RESPONSIVE
-        ========================= */
+        .hidden {
+            display: none !important;
+        }
 
         @media (max-width: 700px) {
-
-            h1 {
-                font-size: 38px;
+            nav {
+                justify-content: center;
             }
 
             .stats {
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .plateau {
+            .board {
                 grid-template-columns: repeat(5, 1fr);
             }
 
-            .case {
-                min-height: 55px;
-                font-size: 13px;
+            h1 {
+                font-size: 30px;
             }
-
         }
-
     </style>
 </head>
 
 <body>
 
+<nav>
+    <a href="/" class="logo">🎲 DÉFI RÉFLEXION</a>
+
+    <div class="nav-links">
+        <a href="/">🏠 Accueil</a>
+
+        {% if utilisateur_connecte %}
+            <span class="user-name">
+                👤 {{ utilisateur_connecte }}
+            </span>
+
+            <a href="/deconnexion">
+                🚪 Déconnexion
+            </a>
+        {% else %}
+            <a href="/connexion">
+                🔐 Connexion
+            </a>
+
+            <a href="/inscription">
+                📝 Inscription
+            </a>
+        {% endif %}
+
+        <a href="/admin/login">
+            👨‍💼 Administration
+        </a>
+
+        <a href="/classement">
+            🏆 Classement
+        </a>
+    </div>
+</nav>
+
+
 <div class="container">
 
-    <!-- =====================================================
-         ACCUEIL
-    ====================================================== -->
+    <!-- ACCUEIL -->
+    <section id="homeSection" class="card home">
 
-    <section id="accueil">
+        <h1>🎯 DÉFI RÉFLEXION</h1>
 
-        <div class="logo">🎲</div>
-
-        <h1>Défi Réflexion</h1>
-
-        <p class="description">
-            Teste tes connaissances, relève les défis
-            et deviens le meilleur !
+        <p class="subtitle">
+            Teste tes connaissances, avance sur le plateau
+            et atteins la case 30 pour gagner !
         </p>
 
-        <div class="buttons">
+        <button onclick="startGame()">
+            🎮 Commencer une partie
+        </button>
 
-    <button onclick="startGame()">
-        🎮 Jouer
-    </button>
-
-    <button onclick="window.location.href='/connexion'">
-        👤 Connexion
-    </button>
-
-    <a href="/classement" class="btn">
-        🏆 Classement
-    </a>
-
-    <a href="/admin/login" class="btn">
-        🔐 Administration
-    </a>
-
-</div>
-
-<div class="buttons">
-
-    <button onclick="startGame()">
-        🎮 Jouer
-    </button>
-
-    {% if utilisateur_connecte %}
-
-    <div class="user-connected">
-        👤 Connecté : <strong>{{ utilisateur_connecte }}</strong>
-    </div>
-
-    <a href="/deconnexion" class="btn">
-        👋 Déconnexion
-    </a>
-
-{% else %}
-
-    <button onclick="window.location.href='/connexion'">
-        👤 Connexion
-    </button>
-
-{% endif %}
-
-    <a href="/classement" class="btn">
-        🏆 Classement
-    </a>
-
-    <a href="/admin/login" class="btn">
-        🔐 Administration
-    </a>
-
-</div>
-        <div class="features">
-
-            <div class="card">
-                <h3>🧠 Questions</h3>
-                <p>Teste tes connaissances.</p>
-            </div>
-
-            <div class="card">
-                <h3>🎯 Défis</h3>
-                <p>Relève les défis.</p>
-            </div>
-
-            <div class="card">
-                <h3>🏆 Classement</h3>
-                <p>Compare ton score.</p>
-            </div>
-
-        </div>
+        <a href="/classement" class="button-link secondary">
+            🏆 Voir le classement
+        </a>
 
     </section>
 
 
-    <!-- =====================================================
-         JEU
-    ====================================================== -->
+    <!-- JEU -->
+    <section id="gameSection" class="card hidden">
 
-    <section id="jeu">
+        <h2>🎯 DÉFI RÉFLEXION</h2>
 
-        <div class="game-header">
-
-            <h2>🎲 DÉFI RÉFLEXION</h2>
-
-            <p>
-                Atteins la case 30 pour gagner !
-            </p>
-
-        </div>
+        <p>
+            Atteins la case <strong>30</strong> pour gagner !
+        </p>
 
 
         <!-- STATISTIQUES -->
-
         <div class="stats">
 
             <div class="stat">
-                <div class="stat-icon">📍</div>
-                <div>Case</div>
-                <div class="stat-value" id="position">
-                    1/30
-                </div>
+                <div class="stat-label">📍 Case</div>
+                <div class="stat-value" id="position">1</div>
             </div>
 
             <div class="stat">
-                <div class="stat-icon">❤️</div>
-                <div>Vies</div>
-                <div class="stat-value" id="vies">
-                    3
-                </div>
+                <div class="stat-label">❤️ Vies</div>
+                <div class="stat-value" id="vies">3</div>
             </div>
 
             <div class="stat">
-                <div class="stat-icon">⭐</div>
-                <div>Points</div>
-                <div class="stat-value" id="points">
-                    0
-                </div>
+                <div class="stat-label">⭐ Points</div>
+                <div class="stat-value" id="points">0</div>
             </div>
 
             <div class="stat">
-                <div class="stat-icon">🪙</div>
-                <div>Jetons</div>
-                <div class="stat-value" id="jetons">
-                    0
-                </div>
+                <div class="stat-label">🪙 Jetons</div>
+                <div class="stat-value" id="jetons">0</div>
             </div>
 
             <div class="stat">
-                <div class="stat-icon">🔥</div>
-                <div>Série</div>
-                <div class="stat-value" id="serie">
-                    0
-                </div>
+                <div class="stat-label">🔥 Série</div>
+                <div class="stat-value" id="serie">0</div>
             </div>
 
         </div>
 
 
         <!-- PLATEAU -->
+        <div id="board" class="board"></div>
 
-        <div class="plateau" id="plateau"></div>
 
-
-        <!-- ACTION -->
-
-        <div class="action-panel">
-
-            <div id="message">
-                🎯 Lance le dé pour commencer !
-            </div>
-
-            <button id="diceButton" onclick="rollDice()">
-                🎲 Lancer le dé
-            </button>
-
-        </div>
+        <!-- MESSAGE -->
+        <div id="message" class="message hidden"></div>
 
 
         <!-- QUESTION -->
+        <div id="questionBox" class="question-box hidden">
 
-        <div id="questionPanel">
-
-            <div id="questionType">
-                🧠 CARTE QUESTION
-            </div>
-
-            <div id="question">
-                Question
-            </div>
+            <div id="question" class="question"></div>
 
             <div id="answers"></div>
 
         </div>
 
 
-        <button
-            class="back-button"
-            onclick="backHome()">
-            🏠 Retour à l'accueil
-        </button>
+        <!-- ACTIONS -->
+        <div class="actions">
+
+            <button id="diceButton" onclick="rollDice()">
+                🎲 Lancer le dé
+            </button>
+
+            <button
+                id="homeButton"
+                class="secondary"
+                onclick="backHome()">
+                🏠 Retour à l'accueil
+            </button>
+
+        </div>
 
     </section>
 
@@ -488,186 +386,218 @@
 
 <script>
 
-    // =====================================================
-    // VARIABLES
-    // =====================================================
-
-    let gameStarted = false;
+    let partieTerminee = false;
 
 
-    // =====================================================
-    // CREER LE PLATEAU
-    // =====================================================
+    // ==============================
+    // PLATEAU
+    // ==============================
 
     function createBoard(position = 1) {
 
-        const plateau = document.getElementById("plateau");
+        const board = document.getElementById("board");
 
-        plateau.innerHTML = "";
+        board.innerHTML = "";
 
         for (let i = 1; i <= 30; i++) {
 
-            const caseElement = document.createElement("div");
+            const cell = document.createElement("div");
 
-            caseElement.className = "case";
+            cell.className = "case";
 
             if (i === position) {
-                caseElement.classList.add("joueur");
-                caseElement.innerHTML =
-                    i + "<br>🎮";
+                cell.classList.add("active");
+                cell.textContent = i + " 🎯";
             } else {
-                caseElement.textContent = i;
+                cell.textContent = i;
             }
 
-            plateau.appendChild(caseElement);
+            board.appendChild(cell);
         }
     }
 
 
-    // =====================================================
-    // METTRE À JOUR LES STATS
-    // =====================================================
+    // ==============================
+    // JOUEUR
+    // ==============================
 
     function updatePlayer(joueur) {
 
+        if (!joueur) return;
+
         document.getElementById("position").textContent =
-            joueur.position + "/30";
+            joueur.position ?? 1;
 
         document.getElementById("vies").textContent =
-            joueur.vies;
+            joueur.vies ?? 0;
 
         document.getElementById("points").textContent =
-            joueur.points;
+            joueur.points ?? 0;
 
         document.getElementById("jetons").textContent =
-            joueur.jetons;
+            joueur.jetons ?? 0;
 
         document.getElementById("serie").textContent =
-            joueur.serie;
+            joueur.serie ?? 0;
 
-        createBoard(joueur.position);
+        createBoard(joueur.position ?? 1);
     }
 
 
-    // =====================================================
-    // DÉMARRER UNE PARTIE
-    // =====================================================
+    // ==============================
+    // MESSAGE
+    // ==============================
+
+    function showMessage(message) {
+
+        const box = document.getElementById("message");
+
+        if (!message) {
+
+            box.classList.add("hidden");
+            box.textContent = "";
+
+            return;
+        }
+
+        box.classList.remove("hidden");
+
+        box.textContent = message;
+    }
+
+
+    // ==============================
+    // COMMENCER / REJOUER
+    // ==============================
 
     async function startGame() {
 
         try {
 
-            const response = await fetch(
-                "/api/start",
-                {
-                    method: "POST"
-                }
-            );
+            const response = await fetch("/api/start", {
+                method: "POST"
+            });
 
             const data = await response.json();
 
-            if (!data.success) {
+            console.log("📥 Réponse /api/start :", data);
 
-                alert(data.message || "Erreur.");
+            if (!response.ok || !data.success) {
+
+                showMessage(
+                    data.message || "❌ Impossible de commencer la partie."
+                );
 
                 return;
             }
 
-            gameStarted = true;
+            partieTerminee = false;
 
-            document.getElementById("accueil").style.display =
-                "none";
+            document.getElementById("homeSection")
+                .classList.add("hidden");
 
-            document.getElementById("jeu").style.display =
-                "block";
+            document.getElementById("gameSection")
+                .classList.remove("hidden");
 
-            document.getElementById("message").textContent =
-                data.message;
+            document.getElementById("questionBox")
+                .classList.add("hidden");
+
+            const diceButton =
+                document.getElementById("diceButton");
+
+            diceButton.textContent = "🎲 Lancer le dé";
+
+            diceButton.disabled = false;
 
             updatePlayer(data.joueur);
 
-            document.getElementById("questionPanel").style.display =
-                "none";
-
-            document.getElementById("diceButton").disabled =
-                false;
+            showMessage(data.message || "🎮 Nouvelle partie !");
 
         } catch (error) {
 
-            console.error(error);
+            console.error("❌ Erreur startGame :", error);
 
-            alert(
+            showMessage(
                 "❌ Impossible de contacter le serveur."
             );
         }
     }
 
 
-    // =====================================================
+    // ==============================
     // LANCER LE DÉ
-    // =====================================================
+    // ==============================
 
     async function rollDice() {
 
-        const button =
+        if (partieTerminee) {
+
+            await startGame();
+
+            return;
+        }
+
+        const diceButton =
             document.getElementById("diceButton");
 
-        button.disabled = true;
-
-        document.getElementById("message").textContent =
-            "🎲 Le dé roule...";
+        diceButton.disabled = true;
 
         try {
 
-            const response = await fetch(
-                "/api/dice",
-                {
-                    method: "POST"
-                }
-            );
+            const response = await fetch("/api/dice", {
+                method: "POST"
+            });
 
             const data = await response.json();
 
-            if (!data.success) {
+            console.log("📥 Réponse /api/dice :", data);
 
-                document.getElementById("message").textContent =
-                    data.message || "Erreur.";
+            if (!response.ok || !data.success) {
 
-                button.disabled = false;
+                showMessage(
+                    data.message || "❌ Impossible de lancer le dé."
+                );
+
+                diceButton.disabled = false;
 
                 return;
             }
-
-
-            // Mise à jour du joueur
 
             updatePlayer(data.joueur);
 
-
-            // Résultat du dé
-
-            document.getElementById("message").textContent =
-                "🎲 Tu as obtenu " +
-                data.de +
-                " ! " +
-                data.message;
+            showMessage(
+                data.message ||
+                `🎲 Tu as obtenu ${data.de}.`
+            );
 
 
-            // Victoire
+            // ==========================
+            // VICTOIRE
+            // ==========================
 
             if (data.victoire) {
 
-                button.disabled = true;
+                partieTerminee = true;
 
-                document.getElementById("message").textContent =
-                    "🏆 VICTOIRE ! " +
-                    data.message;
+                document.getElementById("questionBox")
+                    .classList.add("hidden");
+
+                diceButton.textContent = "🔄 Rejouer";
+
+                diceButton.disabled = false;
+
+                showMessage(
+                    data.message ||
+                    "🏆 Félicitations ! Tu as gagné !"
+                );
 
                 return;
             }
 
 
-            // Question / Défi
+            // ==========================
+            // QUESTION / DÉFI
+            // ==========================
 
             if (
                 data.type === "QUESTION" ||
@@ -680,33 +610,48 @@
             }
 
 
-            // Chance / Piège
+            // ==========================
+            // CHANCE / PIÈGE
+            // ==========================
 
-            button.disabled = false;
+            diceButton.disabled = false;
+
+
+            // GAME OVER après effet
+            if (
+                data.joueur &&
+                data.joueur.vies <= 0
+            ) {
+
+                gameOver(
+                    data.message ||
+                    "💀 GAME OVER !"
+                );
+
+                return;
+            }
 
         } catch (error) {
 
-            console.error(error);
+            console.error("❌ Erreur rollDice :", error);
 
-            document.getElementById("message").textContent =
-                "❌ Erreur de connexion.";
+            showMessage(
+                "❌ Erreur de communication avec le serveur."
+            );
 
-            button.disabled = false;
+            diceButton.disabled = false;
         }
     }
 
 
-    // =====================================================
+    // ==============================
     // AFFICHER QUESTION
-    // =====================================================
+    // ==============================
 
     function showQuestion(data) {
 
-        const panel =
-            document.getElementById("questionPanel");
-
-        const type =
-            document.getElementById("questionType");
+        const questionBox =
+            document.getElementById("questionBox");
 
         const question =
             document.getElementById("question");
@@ -714,148 +659,231 @@
         const answers =
             document.getElementById("answers");
 
-
-        if (data.type === "QUESTION") {
-
-            type.textContent =
-                "🧠 CARTE QUESTION";
-
-        } else {
-
-            type.textContent =
-                "⚡ CARTE DÉFI";
-        }
-
+        questionBox.classList.remove("hidden");
 
         question.textContent =
-            data.question;
-
+            data.question || "❓ Question";
 
         answers.innerHTML = "";
 
+        data.reponses.forEach((reponse, index) => {
 
-        data.reponses.forEach(
-            (reponse, index) => {
+            const button =
+                document.createElement("button");
 
-                const button =
-                    document.createElement("button");
+            button.textContent = reponse;
 
-                button.className = "answer";
+            button.onclick = function () {
 
-                button.textContent =
-                    (index + 1) + ". " + reponse;
+                answerQuestion(index);
 
-                button.onclick =
-                    () => answerQuestion(index);
+            };
 
-                answers.appendChild(button);
-            }
-        );
+            answers.appendChild(button);
+
+        });
 
 
-        panel.style.display =
-            "block";
-
-        document.getElementById("diceButton").disabled =
-            true;
+        document.getElementById("diceButton").disabled = true;
     }
 
 
-    // =====================================================
+    // ==============================
     // RÉPONDRE
-    // =====================================================
+    // ==============================
 
     async function answerQuestion(choix) {
 
         const buttons =
-            document.querySelectorAll(".answer");
+            document.querySelectorAll("#answers button");
 
-        buttons.forEach(
-            button => button.disabled = true
-        );
+        buttons.forEach(button => {
+            button.disabled = true;
+        });
 
+        console.log("📤 Réponse envoyée :", choix);
 
         try {
 
-            const response = await fetch(
-                "/api/answer",
-                {
-                    method: "POST",
+            const response = await fetch("/api/answer", {
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+                method: "POST",
 
-                    body: JSON.stringify({
-                        choix: choix
-                    })
-                }
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    choix: choix
+                })
+
+            });
+
+
+            console.log(
+                "📥 Statut /api/answer :",
+                response.status
             );
 
 
-            const data =
-                await response.json();
+            const data = await response.json();
+
+            console.log(
+                "📥 Réponse /api/answer :",
+                data
+            );
 
 
-            document.getElementById("message").textContent =
-                data.message;
+            if (!response.ok || !data.success) {
 
+                showMessage(
+                    data.message ||
+                    "❌ Une erreur est survenue."
+                );
 
-            updatePlayer(data.joueur);
-
-
-            document.getElementById("questionPanel").style.display =
-                "none";
-
-
-            if (data.game_over) {
-
-                document.getElementById("diceButton").disabled =
-                    true;
-
-                document.getElementById("message").textContent +=
-                    " 💀 Partie terminée.";
+                buttons.forEach(button => {
+                    button.disabled = false;
+                });
 
                 return;
             }
 
 
-            document.getElementById("diceButton").disabled =
-                false;
+            updatePlayer(data.joueur);
 
+            showMessage(data.message);
+
+            document.getElementById("questionBox")
+                .classList.add("hidden");
+
+
+            // ==========================
+            // GAME OVER
+            // ==========================
+
+            if (data.game_over) {
+
+                gameOver(
+                    data.message ||
+                    "💀 GAME OVER !"
+                );
+
+                return;
+            }
+
+
+            // ==========================
+            // VICTOIRE
+            // ==========================
+
+            if (data.victoire) {
+
+                victoire(
+                    data.message ||
+                    "🏆 Félicitations ! Tu as gagné !"
+                );
+
+                return;
+            }
+
+
+            // ==========================
+            // CONTINUER
+            // ==========================
+
+            document.getElementById("diceButton")
+                .disabled = false;
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                "❌ Erreur answerQuestion :",
+                error
+            );
 
-            document.getElementById("message").textContent =
-                "❌ Erreur de connexion.";
+            showMessage(
+                "❌ Erreur de communication avec le serveur."
+            );
 
+            buttons.forEach(button => {
+                button.disabled = false;
+            });
         }
-
     }
 
 
-    // =====================================================
+    // ==============================
+    // GAME OVER
+    // ==============================
+
+    function gameOver(message) {
+
+        partieTerminee = true;
+
+        document.getElementById("questionBox")
+            .classList.add("hidden");
+
+        const diceButton =
+            document.getElementById("diceButton");
+
+        diceButton.textContent = "🔄 Rejouer";
+
+        diceButton.disabled = false;
+
+        showMessage(
+            message || "💀 GAME OVER !"
+        );
+    }
+
+
+    // ==============================
+    // VICTOIRE
+    // ==============================
+
+    function victoire(message) {
+
+        partieTerminee = true;
+
+        document.getElementById("questionBox")
+            .classList.add("hidden");
+
+        const diceButton =
+            document.getElementById("diceButton");
+
+        diceButton.textContent = "🔄 Rejouer";
+
+        diceButton.disabled = false;
+
+        showMessage(
+            message || "🏆 Félicitations ! Tu as gagné !"
+        );
+    }
+
+
+    // ==============================
     // RETOUR ACCUEIL
-    // =====================================================
+    // ==============================
 
     function backHome() {
 
-        document.getElementById("jeu").style.display =
-            "none";
+        document.getElementById("gameSection")
+            .classList.add("hidden");
 
-        document.getElementById("accueil").style.display =
-            "block";
+        document.getElementById("homeSection")
+            .classList.remove("hidden");
 
-        gameStarted = false;
+        document.getElementById("questionBox")
+            .classList.add("hidden");
+
+        partieTerminee = false;
+
+        showMessage("");
     }
 
 
-    // =====================================================
+    // ==============================
     // INITIALISATION
-    // =====================================================
+    // ==============================
 
     createBoard(1);
 
